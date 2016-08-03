@@ -1,7 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var concat = _interopDefault(require('unique-concat'));
@@ -37,9 +35,9 @@ GlobImporter.resolve = function resolve (url, includePaths) {
   });
 };
 
-GlobImporter.prototype.importer = function importer () {
+GlobImporter.importer = function importer () {
   return function nodeSassImporter(url, prev, done) {
-      var importer = this;
+    var importer = this;
     // Create a set of all paths to search for files.
     var includePaths = [];
     if (path.isAbsolute(prev)) {
@@ -53,8 +51,6 @@ GlobImporter.prototype.importer = function importer () {
   };
 };
 
-var globImporter = new GlobImporter();
-var index = globImporter.importer();
+var index = GlobImporter.importer();
 
-exports.GlobImporter = GlobImporter;
-exports['default'] = index;
+module.exports = index;
