@@ -1,7 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var concat = _interopDefault(require('unique-concat'));
@@ -10,10 +8,7 @@ var path = _interopDefault(require('path'));
 
 var GlobImporter = function GlobImporter () {};
 
-GlobImporter.resolveSync = function resolveSync (
-  url,
-  includePaths
-) {
+GlobImporter.resolveSync = function resolveSync (url, includePaths) {
     if ( includePaths === void 0 ) includePaths = [process.cwd()];
 
   if (glob.hasMagic(url)) {
@@ -32,10 +27,7 @@ GlobImporter.resolveSync = function resolveSync (
   return null;
 };
 
-GlobImporter.resolve = function resolve (
-  url,
-  includePaths
-) {
+GlobImporter.resolve = function resolve (url, includePaths) {
     if ( includePaths === void 0 ) includePaths = [process.cwd()];
 
   return new Promise(function (promiseResolve) {
@@ -43,9 +35,9 @@ GlobImporter.resolve = function resolve (
   });
 };
 
-GlobImporter.prototype.importer = function importer () {
+GlobImporter.importer = function importer () {
   return function nodeSassImporter(url, prev, done) {
-      var importer = this;
+    var importer = this;
     // Create a set of all paths to search for files.
     var includePaths = [];
     if (path.isAbsolute(prev)) {
@@ -59,8 +51,6 @@ GlobImporter.prototype.importer = function importer () {
   };
 };
 
-var globImporter = new GlobImporter();
-var index = globImporter.importer();
+var index = GlobImporter.importer();
 
-exports.GlobImporter = GlobImporter;
-exports['default'] = index;
+module.exports = index;
