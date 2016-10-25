@@ -2,10 +2,12 @@
   "name": "node-sass-glob-importer",
   "description": "Custom node-sass importer to allow you to use glob syntax in imports",
   "keywords": [
+    "glob-importer",
+    "importer",
     "node-sass",
     "sass"
   ],
-  "version": "2.0.8",
+  "version": "2.0.9",
   "author": "Markus Oberlehner",
   "homepage": "https://github.com/maoberlehner/node-sass-glob-importer",
   "license": "MIT",
@@ -23,6 +25,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "esdoc": "^0.4.8",
     "eslint": "^3.6.0",
     "eslint-config-modularis": "^1.0.0",
     "eslint-plugin-import": "^1.16.0",
@@ -31,9 +34,6 @@
     "pre-git": "^3.10.0",
     "rollup": "^0.36.0",
     "rollup-plugin-buble": "^0.14.0"
-  },
-  "optionalDependencies": {
-    "esdoc": "^0.4.8"
   },
   "main": "dist/index.js",
   "jsnext:main": "js/index.js",
