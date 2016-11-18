@@ -10,61 +10,83 @@ var path = _interopDefault(require('path'));
 /**
  * Import files using glob patterns.
  */
-var GlobImporter = function GlobImporter () {};
+var GlobImporter = function GlobImporter(options) {
+  if ( options === void 0 ) options = {};
 
-GlobImporter.prototype.resolveSync = function resolveSync (url, includePaths) {
-    if ( includePaths === void 0 ) includePaths = [process.cwd()];
-
-  if (glob.hasMagic(url)) {
-    return includePaths.reduce(function (absolutePathStore, includePath) {
-      // Try to resolve the glob pattern.
-      var newAbsolutePaths = glob
-        .sync(url, { cwd: includePath })
-        .map(function (relativePath) { return path.resolve(includePath, relativePath); });
-      // Merge new paths with previously found ones.
-      return concat(absolutePathStore, newAbsolutePaths);
-    }, []);
-  }
-  return null;
+  var defaultOptions = {
+    includePaths: [process.cwd()]
+  };
+  /** @type {Object} */
+  this.options = Object.assign({}, defaultOptions, options);
 };
 
 /**
- * Asynchronously resolve the path to a node-sass import url.
+ * Synchronously resolve node-sass import url glob paths.
  * @param {string} url - Import url from node-sass.
- * @param {Array} includePaths - Paths to consider for importing files.
- * @return {Promise} Promise for an array of fully resolved import urls.
+ * @return {Array} File paths array.
  */
-GlobImporter.prototype.resolve = function resolve (url, includePaths) {
+GlobImporter.prototype.resolveFilePathsSync = function resolveFilePathsSync (url) {
+  var filePaths = [];
+
+  if (glob.hasMagic(url)) {
+    filePaths = this.options.includePaths
+      .reduce(function (absolutePathStore, includePath) {
+        // Try to resolve the glob pattern.
+        var newAbsolutePaths = glob
+          .sync(url, { cwd: includePath })
+          .map(function (relativePath) { return path.resolve(includePath, relativePath); });
+        // Merge new paths with previously found ones.
+        return concat(absolutePathStore, newAbsolutePaths);
+      }, []);
+  }
+
+  return filePaths;
+};
+
+/**
+ * Asynchronously resolve node-sass import url glob paths.
+ * @param {string} url - Import url from node-sass.
+ * @return {Promise} Promise for a file paths array.
+ */
+GlobImporter.prototype.resolveFilePaths = function resolveFilePaths (url) {
     var this$1 = this;
-    if ( includePaths === void 0 ) includePaths = [process.cwd()];
 
   return new Promise(function (promiseResolve) {
-    promiseResolve(this$1.resolveSync(url, includePaths));
+    promiseResolve(this$1.resolveFilePathsSync(url));
   });
 };
 
 /**
- * Glob importer for node-sass
- * @return {function} Returns a node-sass importer function.
+ * Synchronously resolve filtered contents from glob files with the given url.
+ * @param {string} url - Import url from node-sass.
+ * @return {string} Contents string or null.
  */
-GlobImporter.prototype.importer = function importer () {
-  var self = this;
-  return function nodeSassImporter(url, prev) {
-    var importer = this;
-    // Create a set of all paths to search for files.
-    var includePaths = [];
-    if (path.isAbsolute(prev)) {
-      includePaths.push(path.dirname(prev));
-    }
-    includePaths = concat(includePaths, importer.options.includePaths.split(path.delimiter));
-    // Try to resolve the url.
-    var files = self.resolveSync(url, includePaths);
-    if (files) {
-      var contents = files.map(function (x) { return fs.readFileSync(x, { encoding: 'utf8' }); }).join('\n');
-      return { contents: contents };
-    }
-    return null;
-  };
+GlobImporter.prototype.resolveSync = function resolveSync (url) {
+  var filePaths = this.resolveFilePathsSync(url);
+
+  if (filePaths.length) {
+    var contents = filePaths
+      .map(function (x) { return fs.readFileSync(x, { encoding: "utf8" }); })
+      .join("\n");
+
+    return { contents: contents };
+  }
+
+  return null;
+};
+
+/**
+ * Asynchronously resolve filtered contents
+ * from glob files with the given url.
+ * @param {string} url - Import url from node-sass.
+ * @return {Promise} Promise for a contents string.
+ */
+GlobImporter.prototype.resolve = function resolve (url) {
+    var this$1 = this;
+
+  return new Promise(function (promiseResolve) {
+    promiseResolve(this$1.resolveSync(url));
+  });
 };
 
 module.exports = GlobImporter;
